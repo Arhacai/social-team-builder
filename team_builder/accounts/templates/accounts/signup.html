@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <div class="bounds">
+    <div class="grid-30 centered">
+      <h2>Sign Up</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="button-primary">Sign Up</button>
+        <a class="button" href="{% url "login" %}">Sign In</a>
+      </form>
+    </div>
+  </div>
+{% endblock %}
