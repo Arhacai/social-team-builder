@@ -10,11 +10,17 @@ $( document ).ready(function() {
     parent.after(copy);
     copy.find("input, textarea, select").val("");
     copy.find("*:first-child").focus();
+    var total = $("#id_form-TOTAL_FORMS").val();
+    var name = 'form-' + total + '-skill';
+    copy.find("input").attr({"name": name, "id": "id_" + name}).val('');
+    $("#id_form-TOTAL_FORMS").val(parseInt(total)+1);
   });
 
-  $(".circle--clone--list").on("click", "li:not(:only-child) .circle--clone--remove", function(){
+  $(".circle--clone--list").on("click", "li:not(:nth-child(5)) .circle--clone--remove", function(){
     var parent = $(this).parent("li");
     parent.remove();
+    var total = $("#id_form-TOTAL_FORMS").val();
+    $("#id_form-TOTAL_FORMS").val(parseInt(total)-1);
   });
 
   // Adds class to selected item

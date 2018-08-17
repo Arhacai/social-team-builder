@@ -1387,7 +1387,7 @@ hr {
   color: #537d7b;
 }
 /* line 70, ../sass/circle/components/lists.sass */
-li:only-child .circle--clone--remove {
+li:nth-child(5) .circle--clone--remove {
   display: none;
 }
 /* line 74, ../sass/circle/components/lists.sass */
@@ -2002,6 +2002,10 @@ input[type="email"].circle--input--h6, input[type="number"].circle--input--h6, i
 .circle--secondary--module .circle--textarea--input {
   height: 48px;
 }
+.circle--secondary--module a {
+  width: 100%;
+  text-align: center;
+}
 /* line 51, ../sass/circle/components/containers.sass */
 .circle--page {
   margin-bottom: 100px;
@@ -2052,7 +2056,6 @@ input[type="email"].circle--input--h6, input[type="number"].circle--input--h6, i
   text-align: center;
   box-sizing: border-box;
   position: relative;
-  position: relative;
 }
 /* line 73, ../sass/circle/core/mixins.sass */
 .circle--primary--avatar:before {
@@ -2060,6 +2063,14 @@ input[type="email"].circle--input--h6, input[type="number"].circle--input--h6, i
   content: "";
   width: 100%;
   padding-top: 100%;
+}
+.circle--primary--avatar img {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  object-fit: contain;
 }
 /* line 78, ../sass/circle/core/mixins.sass */
 .circle--primary--avatar > .placeholder {
