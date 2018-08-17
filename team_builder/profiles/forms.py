@@ -23,6 +23,7 @@ class ProfileUpdateForm(forms.ModelForm):
         )
     )
     avatar = forms.ImageField(
+        required=False,
         widget=forms.FileInput
     )
 
