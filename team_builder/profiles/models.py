@@ -10,7 +10,7 @@ class Skill(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, related_name="profile")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
     display_name = models.CharField(max_length=100, null=True, blank=True)
     bio = models.CharField(max_length=140, blank=True, default="")
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)

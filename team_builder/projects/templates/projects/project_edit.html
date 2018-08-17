@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+  <form method="POST">
+  {% csrf_token %}
+   <div class="circle--actions--bar">
+        <div class="bounds">
+          <div class="grid-100">
+            <button class="button button-primary">Save Changes</button>
+            <a class="button button-text" href="{% url 'profiles:view-profile' %}">Delete Project</a>
+          </div>
+        </div>
+      </div>
+  {% if messages %}
+    {% for message in messages %}
+    {{ message }}
+    {% endfor %}
+
+{% endif %}
+  <div class="bounds circle--page circle--article">
+    <div class="grid-70">
+      <div class="circle--article--body">
+          {{ project_form.title }}
+          {{ project_form.description }}
+      </div>
+
+      <div class="circle--project--positions">
+        <h2>Positions</h2>
+
+        <ul class="circle--group--list circle--clone--list">
+          {{ position_formset.management_form }}
+          {% for form in position_formset %}
+          <li>
+            {{ form.title }}
+            {{ form.description }}
+            <a class="circle--clone--add">Add Position</a>
+            <a class="circle--clone--remove">Remove</a>
+          </li>
+          {% endfor %}
+        </ul>
+        <button class="button button-primary">Save Project</button>
+
+      </div>
+    </div>
+
+    <div class="grid-25 grid-push-5">
+
+      <div class="circle--secondary--module">
+        <h3>Project Timeline</h3>
+        <p>{{ project_form.timeline}}</p>
+      </div>
+
+      <div class="circle--secondary--module">
+        <h3>Applicant Requirements</h3>
+        <p>{{ project_form.requirements }}</p>
+      </div>
+
+    </div>
+  </div>
+    </form>
+{% endblock %}
