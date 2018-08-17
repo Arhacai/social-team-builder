@@ -1553,6 +1553,11 @@ li:nth-child(5) .circle--clone--remove {
   font-weight: normal;
   color: #999;
 }
+.circle--article--section--span {
+  margin-right: 15px;
+  font-weight: normal;
+  color: #999;
+}
 /* line 66, ../sass/circle/components/headers.sass */
 .circle--article--byline {
   margin: 0;

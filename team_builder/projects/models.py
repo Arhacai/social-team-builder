@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.db import models
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 
 class Position(models.Model):
@@ -21,3 +23,6 @@ class Project(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return HttpResponseRedirect(reverse('projects:view-project', kwargs={'pk': self.pk}))

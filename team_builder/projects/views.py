@@ -75,7 +75,7 @@ class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
                 position = form.save()
                 project.positions.add(position)
             messages.add_message(request, messages.SUCCESS, "Probando")
-            return self.render_to_response(self.get_context_data(object=self.object, project_form=project_form, position_formset=position_formset))
+            return self.get_success_url()
         return self.render_to_response(self.get_context_data(object=self.object, project_form=project_form, position_formset=position_formset))
 
     def get(self, request, *args, **kwargs):
