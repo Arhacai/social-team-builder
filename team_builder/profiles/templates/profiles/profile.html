@@ -5,7 +5,7 @@
   <div class="circle--actions--bar">
     <nav class="bounds">
       <ul class="circle--pill--list">
-        <li><a href="applications.html">Applications</a></li>
+        <li><a href="{% url 'projects:applications' %}">Applications</a></li>
         <li><a class="selected" href="{% url 'profiles:view-profile' %}">Profile</a></li>
         {% if user.is_authenticated and user == profile.user %}
         <li><a href="{% url 'projects:create-project' %}">New Project</a></li>

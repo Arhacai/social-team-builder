@@ -7,6 +7,7 @@ from django.urls import reverse
 class Position(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=140)
+    applications = models.ManyToManyField('Application', blank=True, related_name="position_applications")
 
     def __str__(self):
         return self.title
@@ -31,3 +32,10 @@ class Project(models.Model):
     def delete(self, using=None, keep_parents=False):
         self.positions.all().delete()
         return super(Project, self).delete()
+
+
+class Application(models.Model):
+    applicant = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    position = models.ForeignKey(Position, on_delete=models.CASCADE, related_name="applications_position")
+    accepted = models.BooleanField(default=False)
+    rejected = models.BooleanField(default=False)

@@ -19,6 +19,8 @@
         <h4 class="circle--article--section">Project</h4>
         <h1 class="circle--article--title">{{ project.title }}</h1>
         <p class="circle--article--byline">Project Owner: <a>{{ project.owner.profile.display_name }}</a></p>
+          </br>
+        <p class="circle--article--byline">Status: {% if project.completed %}<a style="text-decoration: none" title="Click to mark as On Course" href="{% url 'projects:change-status' pk=project.pk %}">Completed</a> {% else %} <a style="text-decoration: none" title="Click to mark as Completed" href="{% url 'projects:change-status' pk=project.pk %}">On Course</a> {% endif %}</p>
       </div>
 
       <div class="circle--article--body">

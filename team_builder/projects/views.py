@@ -121,8 +121,8 @@ class ProjectFilterView(generic.ListView):
     template_name = "index.html"
 
     def get_queryset(self):
-        title = self.kwargs.get('title')
-        query_set = models.Project.objects.filter(positions__title__icontains=title)
+        pk = self.kwargs.get('pk')
+        query_set = models.Project.objects.filter(positions__pk=pk)
         return query_set
 
     def get_context_data(self, **kwargs):
@@ -130,7 +130,7 @@ class ProjectFilterView(generic.ListView):
         context['active_projects'] = self.get_queryset().filter(completed=False)
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
-        context['selected'] = self.kwargs.get('title')
+        context['selected'] = str(self.kwargs.get('title'))
         return context
 
 
@@ -147,3 +147,96 @@ class ProjectChangeStatusView(generic.RedirectView):
             project.completed = True
         project.save()
         return super(ProjectChangeStatusView, self).get_redirect_url(*args, **kwargs)
+
+
+class ApplicationView(generic.RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        project = get_object_or_404(models.Project, pk=kwargs.get('project_pk'))
+        position = get_object_or_404(models.Position, pk=kwargs.get('pk'))
+        application, _ = models.Application.objects.get_or_create(
+            applicant=self.request.user,
+            position=position
+        )
+        position.applications.add(application)
+        return reverse_lazy('projects:view-project', kwargs={'pk': project.pk})
+
+
+class ApplicationListView(generic.ListView):
+    template_name = 'projects/applications.html'
+
+    def get_queryset(self):
+        return models.Application.objects.filter(position__project__owner=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(ApplicationListView, self).get_context_data(**kwargs)
+        projects = models.Project.objects.filter(owner=self.request.user)
+        positions = []
+        for project in projects:
+            for position in project.positions.all():
+                positions.append(position)
+        context['projects'] = projects
+        context['positions'] = positions
+        context['applications'] = self.get_queryset()
+        context['status_filter'] = 'all'
+        context['project_filter'] = 0
+        context['position_filter'] = 0
+        return context
+
+
+class ApplicationFilterView(generic.ListView):
+    template_name = 'projects/applications.html'
+
+    def filter_status(self, query_set):
+        status = self.kwargs.get('status')
+        if status == 'new':
+            return query_set.filter(accepted=False, rejected=False)
+        elif status == 'accepted':
+            return query_set.filter(accepted=True)
+        elif status == 'rejected':
+            return query_set.filter(rejected=True)
+        return query_set
+
+    def filter_projects(self, query_set):
+        project_pk = self.kwargs.get('project_pk')
+        if project_pk != '0':
+            return query_set.filter(position__project__pk=project_pk)
+        return query_set
+
+    def filter_positions(self, query_set):
+        position_pk = self.kwargs.get('position_pk')
+        if position_pk != '0':
+            return query_set.filter(position__pk=position_pk)
+        return query_set
+
+    def get_queryset(self):
+        query_set = models.Application.objects.filter(position__project__owner=self.request.user)
+        return self.filter_positions(self.filter_projects(self.filter_status(query_set)))
+
+    def get_context_data(self, **kwargs):
+        context = super(ApplicationFilterView, self).get_context_data(**kwargs)
+        projects = models.Project.objects.filter(owner=self.request.user)
+        positions = []
+        for project in projects:
+            for position in project.positions.all():
+                positions.append(position)
+        context['projects'] = projects
+        context['positions'] = positions
+        context['applications'] = self.get_queryset()
+        context['status_filter'] = self.kwargs.get('status')
+        context['project_filter'] = int(self.kwargs.get('project_pk'))
+        context['position_filter'] = int(self.kwargs.get('position_pk'))
+        return context
+
+
+class ApplicationStatusView(generic.RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        application = get_object_or_404(models.Application, pk=kwargs.get('pk'))
+        if kwargs.get('status') == 'accept':
+            application.accepted = True
+        else:
+            application.rejected = True
+        application.save()
+        return reverse_lazy('projects:applications')
+
