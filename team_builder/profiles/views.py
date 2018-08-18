@@ -18,6 +18,8 @@ class ProfileView(LoginRequiredMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
         context['profile'] = self.get_object()
+        context['active_projects'] = self.request.user.project.filter(completed=False)
+        context['past_projects'] = self.request.user.project.filter(completed=True)
         return context
 
 
@@ -50,8 +52,6 @@ class ProfileEditView(LoginRequiredMixin, generic.UpdateView):
                 if skill_name:
                     skill = models.Skill.objects.get_or_create(skill=skill_name)[0]
                     profile.skills.add(skill)
-                else:
-                    continue
             profile.save()
             return self.get_success_url()
         return self.render_to_response(self.get_context_data(profile_form=profile_form, skills_formset=skills_formset))

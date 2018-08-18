@@ -8,7 +8,7 @@
         <div class="bounds">
           <div class="grid-100">
             <button class="button button-primary">Save Changes</button>
-            <a class="button button-text" href="{% url 'profiles:view-profile' %}">Delete Project</a>
+            <a class="button button-text" href="{% url 'projects:view-project' pk=project.pk %}">Discard Changes</a>
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
       <div class="circle--project--positions">
         <h2>Positions</h2>
 
-        <ul class="circle--group--list circle--clone--list">
+        <ul class="circle--group--list circle--clone--list--position">
           {{ position_formset.management_form }}
           {% for form in position_formset %}
           <li>

@@ -4,7 +4,7 @@ from django.forms import formset_factory
 from . import models
 
 
-class ProjectCreateForm(forms.ModelForm):
+class ProjectForm(forms.ModelForm):
 
     title = forms.CharField(
         label='Project Title',

@@ -3,7 +3,7 @@ $( document ).ready(function() {
   $('textarea').autogrow({onInitialize: true});
 
 
-  //Cloner for infinite input lists
+  //Cloner for infinite input lists for skills
   $(".circle--clone--list").on("click", ".circle--clone--add", function(){
     var parent = $(this).parent("li");
     var copy = parent.clone();
@@ -17,6 +17,28 @@ $( document ).ready(function() {
   });
 
   $(".circle--clone--list").on("click", "li:not(:nth-child(5)) .circle--clone--remove", function(){
+    var parent = $(this).parent("li");
+    parent.remove();
+    var total = $("#id_form-TOTAL_FORMS").val();
+    $("#id_form-TOTAL_FORMS").val(parseInt(total)-1);
+  });
+
+  //Cloner for infinite input lists for positions
+  $(".circle--clone--list--position").on("click", ".circle--clone--add", function(){
+    var parent = $(this).parent("li");
+    var copy = parent.clone();
+    parent.after(copy);
+    copy.find("input, textarea, select").val("");
+    copy.find("*:first-child").focus();
+    var total = $("#id_form-TOTAL_FORMS").val();
+    var title = 'form-' + total + '-title';
+    var description = 'form-' + total + '-description';
+    copy.find("input").attr({"name": title, "id": "id_" + title}).val('');
+    copy.find("textarea").attr({"name": description, "id": "id_" + description}).val('');
+    $("#id_form-TOTAL_FORMS").val(parseInt(total)+1);
+  });
+
+  $(".circle--clone--list--position").on("click", "li:not(:nth-child(5)) .circle--clone--remove", function(){
     var parent = $(this).parent("li");
     parent.remove();
     var total = $("#id_form-TOTAL_FORMS").val();

@@ -18,11 +18,16 @@ class Project(models.Model):
     description = models.CharField(max_length=140)
     requirements = models.CharField(max_length=100)
     timeline = models.CharField(max_length=30, blank=True, default="")
+    completed = models.BooleanField(default=False)
 
-    positions = models.ManyToManyField(Position, blank=True)
+    positions = models.ManyToManyField(Position, blank=False)
 
     def __str__(self):
         return self.title
 
     def get_absolute_url(self):
         return HttpResponseRedirect(reverse('projects:view-project', kwargs={'pk': self.pk}))
+
+    def delete(self, using=None, keep_parents=False):
+        self.positions.all().delete()
+        return super(Project, self).delete()

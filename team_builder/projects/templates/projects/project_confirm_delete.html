@@ -7,7 +7,7 @@
   <div class="circle--actions--bar">
     <div class="bounds">
       <div class="grid-100">
-        <span class="circle--article--section--span">Are you sure you want to delete it?</span>
+        <span class="circle--article--section--span">Are you sure you want to delete this project?</span>
         <button class="button">Delete</button>
         <a class="button button-text" href="{% url 'projects:view-project' pk=project.pk %}">Cancel</a>
       </div>
@@ -45,8 +45,9 @@
       <div class="circle--secondary--module">
         <h3>Project Needs</h3>
         <ul class="circle--link--list">
-          <li><a>iOS Developer</a></li>
-          <li><a>Designer</a></li>
+          {% for position in project.positions.all %}
+              <li><a href="#{{ position.title }}">{{ position.title }}</a></li>
+           {% endfor %}
         </ul>
       </div>
 
