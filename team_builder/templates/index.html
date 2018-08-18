@@ -21,7 +21,7 @@
         <ul class="circle--filter--list">
           <li><a {% if not selected %}class="selected" {% endif %} href="{% url 'home' %}">All Needs</a></li>
           {% for position in positions %}
-            <li><a {% if selected == position.title %} class="selected" {% endif %} href="{% url 'projects:filter' pk=position.pk %}">{{ position.title }}</a></li>
+            <li><a {% if selected == position.pk %} class="selected" {% endif %} href="{% url 'projects:filter' pk=position.pk %}">{{ position.title }}</a></li>
           {% endfor %}
         </ul>
       </div>

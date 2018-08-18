@@ -130,7 +130,7 @@ class ProjectFilterView(generic.ListView):
         context['active_projects'] = self.get_queryset().filter(completed=False)
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
-        context['selected'] = str(self.kwargs.get('title'))
+        context['selected'] = int(self.kwargs.get('pk'))
         return context
 
 
