@@ -7,7 +7,9 @@ from django.urls import reverse
 class Position(models.Model):
     title = models.CharField(max_length=30)
     description = models.CharField(max_length=140)
+    related_project = models.ForeignKey('Project', null=True)
     applications = models.ManyToManyField('Application', blank=True, related_name="position_applications")
+    filled = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

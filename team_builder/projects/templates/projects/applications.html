@@ -6,7 +6,7 @@
     <nav class="bounds">
       <ul class="circle--pill--list">
         <li><a class="selected" href="{% url 'projects:applications' %}">Applications</a></li>
-        <li><a href="{% url 'profiles:view-profile' %}">Profile</a></li>
+        <li><a href="{% url 'profiles:view-profile' pk=user.profile.pk %}">Profile</a></li>
       </ul>
     </nav>
   </div>
@@ -62,9 +62,9 @@
           {% for application in applications %}
           <tr>
             <td class="clickable-row" >
-              <a style="text-decoration: none" href="{% url 'profiles:view-profile' %}">
+              <a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">
                 <h3>{{ application.applicant.profile.display_name }}</h3>
-                  <p><a style="text-decoration: none" href="">Project Title</a></p>
+                  <p><a style="text-decoration: none" href="{% url 'projects:view-project' pk=application.position.related_project.pk %}">{{ application.position.related_project.title }}</a></p>
               </a>
             </td>
             <td class="circle--cell--right">

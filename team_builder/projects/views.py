@@ -43,7 +43,9 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
             project.owner = self.request.user
             project.save()
             for form in position_formset:
-                position = form.save()
+                position = form.save(commit=False)
+                position.related_project = project
+                position.save()
                 project.positions.add(position)
             return HttpResponseRedirect(reverse('projects:view-project', kwargs={'pk': project.pk}))
         return self.render_to_response(self.get_context_data(project_form=project_form, position_formset=position_formset))
@@ -74,7 +76,9 @@ class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
             project.save()
             for form in position_formset:
                 if form.cleaned_data.get('title'):
-                    position = form.save()
+                    position = form.save(commit=False)
+                    position.related_project = project
+                    position.save()
                     project.positions.add(position)
             messages.add_message(request, messages.SUCCESS, "Probando")
             return self.get_success_url()
@@ -233,8 +237,15 @@ class ApplicationStatusView(generic.RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         application = get_object_or_404(models.Application, pk=kwargs.get('pk'))
+        position = application.position
         if kwargs.get('status') == 'accept':
             application.accepted = True
+            position.filled = True
+            position.save()
+            for app in position.applications.all():
+                if not app.accepted:
+                    app.rejected = True
+                    app.save()
         else:
             application.rejected = True
         application.save()

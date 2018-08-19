@@ -17,6 +17,9 @@ class Profile(models.Model):
 
     skills = models.ManyToManyField(Skill, blank=True)
 
+    def __str__(self):
+        return self.display_name
+
     def save(self, *args, **kwargs):
         if not self.display_name:
             self.display_name = self.user.username

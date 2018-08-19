@@ -124,7 +124,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'assets')]
 
-LOGIN_REDIRECT_URL = "profiles:view-profile"
+LOGIN_REDIRECT_URL = "home"
 
 AUTH_USER_MODEL = "accounts.User"
 

@@ -13,13 +13,13 @@ class ProfileView(LoginRequiredMixin, generic.TemplateView):
     template_name = "profiles/profile.html"
 
     def get_object(self):
-        return get_object_or_404(self.model, user=self.request.user)
+        return get_object_or_404(self.model, pk=self.kwargs.get('pk'))
 
     def get_context_data(self, **kwargs):
         context = super(ProfileView, self).get_context_data(**kwargs)
         context['profile'] = self.get_object()
-        context['active_projects'] = self.request.user.project.filter(completed=False)
-        context['past_projects'] = self.request.user.project.filter(completed=True)
+        context['active_projects'] = self.get_object().user.project.filter(completed=False)
+        context['past_projects'] = self.get_object().user.project.filter(completed=True)
         return context
 
 
@@ -31,10 +31,17 @@ class ProfileEditView(LoginRequiredMixin, generic.UpdateView):
     def get_object(self, queryset=None):
         return get_object_or_404(self.model, user=self.request.user)
 
+    def get_context_data(self, **kwargs):
+        context = super(ProfileEditView, self).get_context_data(**kwargs)
+        context['active_projects'] = self.get_object().user.project.filter(completed=False)
+        context['past_projects'] = self.get_object().user.project.filter(completed=True)
+        return context
+
+
     def get_success_url(self):
         if self.request.FILES:
             return HttpResponseRedirect(reverse("profiles:edit-profile"))
-        return HttpResponseRedirect(reverse("profiles:view-profile"))
+        return HttpResponseRedirect(reverse("profiles:view-profile", kwargs={'pk': self.get_object().pk}))
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

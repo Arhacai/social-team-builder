@@ -5,8 +5,10 @@
   <div class="circle--actions--bar">
     <nav class="bounds">
       <ul class="circle--pill--list">
-        <li><a href="applications.html">Applications</a></li>
-        <li><a class="selected" href="profile.html">Profile</a></li>
+        {% if user.is_authenticated and user == profile.user %}
+            <li><a href="{% url 'projects:applications' %}">Applications</a></li>
+        {% endif %}
+        <li><a class="selected" href="{% url 'profiles:view-profile' pk=profile.pk %}">Profile</a></li>
       </ul>
     </nav>
   </div>
@@ -27,33 +29,57 @@
             <div class="circle--input--h1">{{ profile_form.display_name }}</div>
           <div class="circle--article--body">{{ profile_form.bio }}</div>
 
-          <h2>Past Projects</h2>
-          <table class="u-full-width circle--table">
-            <thead>
-              <tr>
-                <th>Project Title</th>
-                <th class="circle--cell--right">Project Needs</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="clickable-row" data-href="project.html">
-                <td>
-                  <h3>Invoice Delivery Tool</h3>
-                </td>
-                <td class="circle--cell--right">
-                  <span class="secondary-label">Rails Developer</span>
-                </td>
-              </tr>
-              <tr class="clickable-row" data-href="project.html">
-                <td>
-                  <h3>Twitter Client</h3>
-                </td>
-                <td class="circle--cell--right">
-                  <span class="secondary-label">Designer</span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          {% if active_projects %}
+      <h2>Active Projects</h2>
+      <table class="u-full-width circle--table">
+        <thead>
+          <tr>
+            <th>Project Title</th>
+            <th class="circle--cell--right">Project Needs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in active_projects %}
+          <tr class="clickable-row" data-href="{% url 'projects:view-project' pk=project.pk %}">
+            <td>
+              <h3>{{ project.title }}</h3>
+            </td>
+            <td class="circle--cell--right">
+              {% for position in project.positions.all %}
+              <span class="secondary-label">{{ position.title }}</span>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+
+      {% if past_projects %}
+      <h2>Past Projects</h2>
+      <table class="u-full-width circle--table">
+        <thead>
+          <tr>
+            <th>Project Title</th>
+            <th class="circle--cell--right">Project Needs</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for project in past_projects %}
+          <tr class="clickable-row" data-href="{% url 'projects:view-project' pk=project.pk %}">
+            <td>
+              <h3>{{ project.title }}</h3>
+            </td>
+            <td class="circle--cell--right">
+              {% for position in project.positions.all %}
+              <span class="secondary-label">{{ position.title }}</span>
+              {% endfor %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
         </div>
 
         <div class="grid-25 grid-push-5">
@@ -86,19 +112,6 @@
               {% endfor %}
             </ul>
 
-          </div>
-
-
-          <div class="circle--secondary--module">
-            <h4>My Projects</h4>
-            <ul class="circle--clone--list">
-              <li>
-                <input type="text" placeholder="Project Name" />
-                <input type="text" placeholder="Project URL" />
-                <a class="circle--clone--add">Add Project</a>
-                <a class="circle--clone--remove">Remove</a>
-              </li>
-            </ul>
           </div>
         </div>
   </form>

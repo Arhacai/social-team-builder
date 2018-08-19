@@ -8,7 +8,7 @@
         <div class="bounds">
           <div class="grid-100">
             <button class="button button-primary">Save Project</button>
-            <a class="button button-text" href="{% url 'profiles:view-profile' %}">Discard</a>
+            <a class="button button-text" href="{% url 'profiles:view-profile' pk=user.profile.pk %}">Discard</a>
           </div>
         </div>
       </div>
