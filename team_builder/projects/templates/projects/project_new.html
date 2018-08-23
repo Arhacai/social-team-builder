@@ -17,7 +17,17 @@
         <div class="grid-70">
           <div class="circle--article--body">
               {{ project_form.title }}
+                {% for error in project_form.title.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
               {{ project_form.description }}
+                {% for error in project_form.description.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
           </div>
 
           <div class="circle--project--positions">
@@ -28,7 +38,23 @@
               {% for form in position_formset %}
               <li>
                 {{ form.title }}
+                    {% for error in form.title.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                    {% endfor %}
                 {{ form.description }}
+                    {% for error in form.description.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                    {% endfor %}
+                {{ form.related_skill }}
+                    {% for error in form.related_skill.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                    {% endfor %}
                 <a class="circle--clone--add">Add Position</a>
                 <a class="circle--clone--remove">Remove</a>
               </li>
@@ -45,11 +71,21 @@
           <div class="circle--secondary--module">
             <h3>Project Timeline</h3>
             <p>{{ project_form.timeline}}</p>
+              {% for error in project_form.timeline.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+              {% endfor %}
           </div>
 
           <div class="circle--secondary--module">
             <h3>Applicant Requirements</h3>
             <p>{{ project_form.requirements }}</p>
+              {% for error in project_form.requirements.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+              {% endfor %}
           </div>
 
         </div>

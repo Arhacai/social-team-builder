@@ -3,7 +3,7 @@ from django.db import models
 
 
 class Skill(models.Model):
-    skill = models.CharField(max_length=50)
+    skill = models.CharField(max_length=30)
 
     def __str__(self):
         return self.skill
@@ -11,8 +11,8 @@ class Skill(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
-    display_name = models.CharField(max_length=100, null=True, blank=True)
-    bio = models.CharField(max_length=140, blank=True, default="")
+    display_name = models.CharField(max_length=50, null=True, blank=True)
+    bio = models.CharField(max_length=500, blank=True, default="")
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
 
     skills = models.ManyToManyField(Skill, blank=True)

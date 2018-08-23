@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
@@ -60,7 +61,9 @@ class ProfileEditView(LoginRequiredMixin, generic.UpdateView):
                     skill = models.Skill.objects.get_or_create(skill=skill_name)[0]
                     profile.skills.add(skill)
             profile.save()
+            messages.add_message(self.request, messages.SUCCESS, "Profile updated successfully!")
             return self.get_success_url()
+        messages.add_message(self.request, messages.ERROR, "Something went wrong! Please check fields with errors...")
         return self.render_to_response(self.get_context_data(profile_form=profile_form, skills_formset=skills_formset))
 
     def get(self, request, *args, **kwargs):

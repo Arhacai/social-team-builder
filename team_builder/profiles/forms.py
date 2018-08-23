@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import MaxLengthValidator
 from django.forms import formset_factory
 
 from . import models
@@ -10,7 +11,8 @@ class ProfileUpdateForm(forms.ModelForm):
         label='Display Name',
         required=False,
         widget=forms.TextInput(
-            attrs={'placeholder': 'Enter your desired display name...'})
+            attrs={'placeholder': 'Enter your desired display name...'}),
+    validators = [MaxLengthValidator]
     )
     bio = forms.CharField(
         label='About You',
@@ -20,7 +22,8 @@ class ProfileUpdateForm(forms.ModelForm):
                 'placeholder': 'Tell us about yourself...',
                 'style': 'resize: both; overflow: auto;',
             }
-        )
+        ),
+        validators=[MaxLengthValidator]
     )
     avatar = forms.ImageField(
         required=False,
@@ -37,7 +40,8 @@ class SkillUpdateForm(forms.ModelForm):
         label='Skill',
         widget=forms.TextInput(
             attrs={'placeholder': 'Skill'}),
-        required=False
+        required=False,
+        validators=[MaxLengthValidator]
     )
 
     class Meta:

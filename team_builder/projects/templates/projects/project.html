@@ -38,15 +38,30 @@
           {% for position in project.positions.all %}
           <li>
             <h3 id="{{ position.title }}">{{ position.title }}</h3>
+            <p style="font-weight: bold">Related skill: {{ position.related_skill }}</p>
             <p>{{ position.description }}</p>
             {% if user == project.owner %}
               <span style="font-weight: bold">Applicants: {% if not position.applications.all %}None{% endif %}</span>
                 {% for application in position.applications.all %}
-                    <span><a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a></span>
+                    {% if not application.accepted %}
+                    <span><a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>|</span>
+                    {% elif application.accepted %}
+                    <span>Accepted(<a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>)|</span>
+                    {% endif %}
                 {% endfor %}
             {% else %}
-                {% if user.is_authenticated %}
-                    <a class="button button-primary" href="{% url 'projects:apply' project_pk=project.pk pk=position.pk %}">Apply</a>
+                {% if user.is_authenticated and not user == project.owner and not project.completed %}
+                    {% if position.filled %}
+                        <a class="button button-primary button-inactive">Position Filled</a>
+                    {% else %}
+                        <a class="button button-primary
+                        {% for application in position.applications.all %}
+                            {% if user == application.applicant %}
+                                 button-inactive" href="#{{ position.title }}"
+                            {% endif %}
+                        {% endfor %}
+                        "href="{% url 'projects:apply' project_pk=project.pk pk=position.pk %}">Apply</a>
+                    {% endif %}
                 {% endif %}
             {% endif %}
           </li>

@@ -14,36 +14,64 @@
     </div>
   </div>
 <div class="bounds circle--page circle--article">
-  <div class="grid-70">
+    <div class="grid-70">
       <div class="circle--article--header">
         <h4 class="circle--article--section">Project</h4>
         <h1 class="circle--article--title">{{ project.title }}</h1>
-        <p class="circle--article--byline">Project Owner: <a>{{ project.owner.profile.display_name }}</a></p>
-          </br>
-        <p class="circle--article--byline">Status: {% if project.completed %}<a style="text-decoration: none" title="Click to mark as On Course" href="{% url 'projects:change-status' pk=project.pk %}">Completed</a> {% else %} <a style="text-decoration: none" title="Click to mark as Completed" href="{% url 'projects:change-status' pk=project.pk %}">On Course</a> {% endif %}</p>
+        <p class="circle--article--byline">Project Owner: <a style="text-decoration: none" title="Click to view user's profile" href="{% url 'profiles:view-profile' pk=project.owner.profile.pk %}">{{ project.owner.profile.display_name }}</a></p>
+        </br>
+        {% if user == project.owner %}
+        <p class="circle--article--byline">Status: {% if project.completed %}<a style="text-decoration: none" title="Click to mark as On Course" href="{% url 'projects:change-status' pk=project.pk %}">Closed</a> {% else %} <a style="text-decoration: none" title="Click to mark as Completed" href="{% url 'projects:change-status' pk=project.pk %}">On Course</a> {% endif %}</p>
+        {% else %}
+        <p class="circle--article--byline">Status: {% if project.completed %}Closed{% else %}On Course{% endif %}</p>
+        {% endif %}
       </div>
 
       <div class="circle--article--body">
         {{ project.description }}
       </div>
 
-        <div class="circle--project--positions">
+      <div class="circle--project--positions">
         <h2>Positions</h2>
 
         <ul class="circle--group--list">
           {% for position in project.positions.all %}
           <li>
-            <h3>{{ position.title }}</h3>
+            <h3 id="{{ position.title }}">{{ position.title }}</h3>
+            <p style="font-weight: bold">Related skill: {{ position.related_skill }}</p>
             <p>{{ position.description }}</p>
-            <a class="button button-primary">Apply</a>
+            {% if user == project.owner %}
+              <span style="font-weight: bold">Applicants: {% if not position.applications.all %}None{% endif %}</span>
+                {% for application in position.applications.all %}
+                    {% if not application.accepted %}
+                    <span><a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>|</span>
+                    {% elif application.accepted %}
+                    <span>Accepted(<a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>)|</span>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {% if user.is_authenticated and not user == project.owner and not project.completed %}
+                    {% if position.filled %}
+                        <a class="button button-primary button-inactive">Position Filled</a>
+                    {% else %}
+                        <a class="button button-primary
+                        {% for application in position.applications.all %}
+                            {% if user == application.applicant %}
+                                 button-inactive" href="#{{ position.title }}"
+                            {% endif %}
+                        {% endfor %}
+                        "href="{% url 'projects:apply' project_pk=project.pk pk=position.pk %}">Apply</a>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
           </li>
           {% endfor %}
         </ul>
       </div>
 
-
     </div>
-  <div class="grid-25 grid-push-5">
+
+    <div class="grid-25 grid-push-5">
       <div class="circle--secondary--module">
         <h3>Project Needs</h3>
         <ul class="circle--link--list">
@@ -65,5 +93,4 @@
 
     </div>
   </div>
-</form>
 {% endblock %}

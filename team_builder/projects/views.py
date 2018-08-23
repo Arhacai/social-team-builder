@@ -47,8 +47,10 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
                 position.related_project = project
                 position.save()
                 project.positions.add(position)
+            messages.add_message(self.request, messages.SUCCESS, "Project created successfully!")
             return HttpResponseRedirect(reverse('projects:view-project', kwargs={'pk': project.pk}))
-        return self.render_to_response(self.get_context_data(project_form=project_form, position_formset=position_formset))
+        messages.add_message(self.request, messages.ERROR, "Something went wrong! Please check fields with errors...")
+        return render(self.request, self.template_name, {'project_form': project_form, 'position_formset': position_formset})
 
 
 class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
@@ -80,15 +82,16 @@ class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
                     position.related_project = project
                     position.save()
                     project.positions.add(position)
-            messages.add_message(request, messages.SUCCESS, "Probando")
+            messages.add_message(self.request, messages.SUCCESS, "Project updated successfully!")
             return self.get_success_url()
+        messages.add_message(self.request, messages.ERROR, "Something went wrong! Please check fields with errors...")
         return self.render_to_response(self.get_context_data(object=self.object, project_form=project_form, position_formset=position_formset))
 
     def get(self, request, *args, **kwargs):
         super(ProjectEditView, self).get(request, *args, **kwargs)
         project_form = self.form_class(instance=self.object)
         positions = self.object.positions.all()
-        data = [{'title': position.title, 'description': position.description} for position in positions]
+        data = [{'title': position.title, 'description': position.description, 'related_skill': position.related_skill} for position in positions]
         if not data:
             position_formset = forms.PositionFormSet(initial=[{'title': '', 'description': ''}])
         else:
@@ -241,6 +244,7 @@ class ApplicationStatusView(generic.RedirectView):
         if kwargs.get('status') == 'accept':
             application.accepted = True
             position.filled = True
+            position.filled_by = application.applicant
             position.save()
             for app in position.applications.all():
                 if not app.accepted:
@@ -249,5 +253,5 @@ class ApplicationStatusView(generic.RedirectView):
         else:
             application.rejected = True
         application.save()
-        return reverse_lazy('projects:applications')
+        return self.request.META['HTTP_REFERER']
 
