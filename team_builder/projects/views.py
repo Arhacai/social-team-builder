@@ -121,6 +121,8 @@ class ProjectSearchView(generic.ListView):
         context['active_projects'] = self.get_queryset().filter(completed=False)
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
+        context['skills'] = [position.related_skill for position in models.Position.objects.filter(
+            id__in=models.Position.objects.all().values_list('related_skill', flat=True).distinct())]
         return context
 
 
@@ -129,8 +131,8 @@ class ProjectFilterView(generic.ListView):
     template_name = "index.html"
 
     def get_queryset(self):
-        pk = self.kwargs.get('pk')
-        query_set = models.Project.objects.filter(positions__pk=pk)
+        slug = self.kwargs.get('slug')
+        query_set = models.Project.objects.filter(Q(positions__title=slug) | Q(positions__related_skill__skill=slug))
         return query_set
 
     def get_context_data(self, **kwargs):
@@ -138,7 +140,9 @@ class ProjectFilterView(generic.ListView):
         context['active_projects'] = self.get_queryset().filter(completed=False)
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
-        context['selected'] = int(self.kwargs.get('pk'))
+        context['skills'] = [position.related_skill for position in models.Position.objects.filter(
+            id__in=models.Position.objects.all().values_list('related_skill', flat=True).distinct())]
+        context['selected'] = self.kwargs.get('slug')
         return context
 
 
