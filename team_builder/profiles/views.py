@@ -3,6 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.urls import reverse_lazy
 from django.views import generic
 
 from . import forms
@@ -76,3 +77,34 @@ class ProfileEditView(LoginRequiredMixin, generic.UpdateView):
         else:
             skills_formset = forms.SkillFormSet(initial=skill_data)
         return self.render_to_response(self.get_context_data(profile_form=profile_form, skills_formset=skills_formset))
+
+
+class NotificationsView(generic.ListView):
+    template_name = "profiles/notifications.html"
+
+    def get_queryset(self):
+        return models.Notification.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(NotificationsView, self).get_context_data(**kwargs)
+        context['profile'] = models.Profile.objects.get(user=self.request.user)
+        context['new_notifications'] = self.get_queryset().filter(read=False).order_by('-created_at')
+        context['old_notifications'] = self.get_queryset().filter(read=True).order_by('-created_at')
+        return context
+
+
+class NotificationReadView(generic.RedirectView):
+
+    def get_redirect_url(self, *args, **kwargs):
+        notification = models.Notification.objects.get(pk=self.kwargs.get('pk'))
+        notification.read = True
+        notification.save()
+        return reverse_lazy('profiles:notifications')
+
+
+class NotificationDeleteView(generic.DeleteView):
+    model = models.Notification
+    success_url = reverse_lazy('profiles:notifications')
+
+    def get(self, request, *args, **kwargs):
+        return self.post(request, *args, **kwargs)

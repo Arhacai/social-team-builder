@@ -44,9 +44,9 @@
               <span style="font-weight: bold">Applicants: {% if not position.applications.all %}None{% endif %}</span>
                 {% for application in position.applications.all %}
                     {% if not application.accepted %}
-                    <span><a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>|</span>
+                    <span><a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a></span>
                     {% elif application.accepted %}
-                    <span>Accepted(<a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>)|</span>
+                    <span>Accepted(<a style="text-decoration: none" href="{% url 'profiles:view-profile' pk=application.applicant.profile.pk %}">{{ application.applicant.profile.display_name }}</a>)</span>
                     {% endif %}
                 {% endfor %}
             {% else %}

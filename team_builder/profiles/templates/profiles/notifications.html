@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+{% load static from staticfiles %}
+
+{% block content %}
+<div class="circle--actions--bar">
+    <nav class="bounds">
+      <ul class="circle--pill--list">
+        {% if user.is_authenticated and user == profile.user %}
+            <li><a href="{% url 'projects:applications' %}">Applications</a></li>
+        {% endif %}
+        <li><a href="{% url 'profiles:view-profile' pk=profile.pk %}">Profile</a></li>
+        {% if user.is_authenticated and user == profile.user %}
+            <li><a class="selected" href="{% url 'profiles:notifications' %}">Notifications</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="bounds circle--page">
+    <div class="circle--page--header circle--fluid">
+      {% if not new_notifications and not old_notifications %}
+        <p>There are no notifications to show</p>
+      {% else %}
+      <div class="circle--fluid--cell circle--fluid--primary">
+        <h2>New Notifications</h2>
+      </div>
+    </div>
+
+    <div class="grid-100">
+      <div class="circle--article--body">
+          {% for notification in new_notifications %}
+          <p>{{ notification.created_at|date }}: {{ notification.message }}<a style="text-decoration: none; margin-left: 20px;" class="secondary-label" href="{% url 'profiles:notifications-read' pk=notification.pk %}">Mark as read</a></p>
+          {% endfor %}
+      </div>
+    </div>
+
+    <div class="circle--page--header circle--fluid">
+      <div class="circle--fluid--cell circle--fluid--primary">
+        <h2>Old Notifications</h2>
+      </div>
+    </div>
+
+    <div class="grid-100">
+      <div class="circle--article--body">
+          {% for notification in old_notifications %}
+          <p>{{ notification.created_at|date }}: {{ notification.message }}<a style="text-decoration: none; margin-left: 20px;" class="secondary-label" href="{% url 'profiles:notifications-delete' pk=notification.pk %}">Delete</a></p>
+          {% endfor %}
+    {% endif %}
+      </div>
+    </div>
+{% endblock %}

@@ -33,8 +33,10 @@ $( document ).ready(function() {
     var total = $("#id_form-TOTAL_FORMS").val();
     var title = 'form-' + total + '-title';
     var description = 'form-' + total + '-description';
-    copy.find("input").attr({"name": title, "id": "id_" + title}).val('');
+    var related_skill = 'form-' + total + '-related_skill';
+    copy.find("input").first().attr({"name": title, "id": "id_" + title}).val('');
     copy.find("textarea").attr({"name": description, "id": "id_" + description}).val('');
+    copy.find("input").last().attr({"name": related_skill, "id": "id_" + related_skill}).val('');
     $("#id_form-TOTAL_FORMS").val(parseInt(total)+1);
   });
 

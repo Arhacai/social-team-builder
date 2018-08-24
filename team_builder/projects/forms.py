@@ -75,10 +75,19 @@ class PositionForm(forms.ModelForm):
         ),
         validators=[MaxLengthValidator]
     )
-    related_skill = forms.ModelChoiceField(
-        empty_label='Select related skill',
-        queryset=Skill.objects.all(),
+    related_skill = forms.CharField(
+        label='Related Skill',
+        required=True,
+        widget=forms.TextInput(
+            attrs={'placeholder': 'Related Skill'}),
+        validators=[MaxLengthValidator]
     )
+
+    def clean_related_skill(self):
+        related_skill = self.cleaned_data.get('related_skill')
+        skill, _ = Skill.objects.get_or_create(skill=related_skill)
+        return skill
+
 
     class Meta:
         fields = ("title", "description", "related_skill")

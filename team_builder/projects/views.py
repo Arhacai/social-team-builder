@@ -8,6 +8,7 @@ from django.views import generic
 
 from . import models
 from . import forms
+from profiles.models import Notification, Skill
 
 
 class ProjectView(generic.TemplateView):
@@ -150,8 +151,16 @@ class ProjectChangeStatusView(generic.RedirectView):
         project = get_object_or_404(models.Project, pk=kwargs.get('pk'))
         if project.completed:
             project.completed = False
+            for position in project.positions.all():
+                if position.filled_by:
+                    Notification.objects.get_or_create(user=position.filled_by,
+                                                       message="The project {} is now open.".format(project))
         else:
             project.completed = True
+            for position in project.positions.all():
+                if position.filled_by:
+                    Notification.objects.get_or_create(user=position.filled_by,
+                                                       message="The project {} is now closed.".format(project))
         project.save()
         return super(ProjectChangeStatusView, self).get_redirect_url(*args, **kwargs)
 
@@ -165,6 +174,9 @@ class ApplicationView(generic.RedirectView):
             applicant=self.request.user,
             position=position
         )
+        Notification.objects.get_or_create(user=self.request.user,
+                                           message="You've applied to {} position for {} project.".format(
+                                               position, project))
         position.applications.add(application)
         return reverse_lazy('projects:view-project', kwargs={'pk': project.pk})
 
@@ -243,15 +255,23 @@ class ApplicationStatusView(generic.RedirectView):
         position = application.position
         if kwargs.get('status') == 'accept':
             application.accepted = True
+            application.save()
+            Notification.objects.get_or_create(user=application.applicant,
+                                              message="Your application on {} has been accepted.".format(
+                                                  application.position))
             position.filled = True
             position.filled_by = application.applicant
             position.save()
             for app in position.applications.all():
                 if not app.accepted:
                     app.rejected = True
+                    Notification.objects.get_or_create(user=app.applicant,
+                                                      message="Your application on {} has been rejected.".format(
+                                                          app.position))
                     app.save()
         else:
             application.rejected = True
-        application.save()
+            application.save()
+            Notification.objects.get_or_create(user=application.applicant, message="Your application on {} has been rejected.".format(application.position))
         return self.request.META['HTTP_REFERER']
 

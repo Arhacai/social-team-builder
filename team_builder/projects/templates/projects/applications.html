@@ -7,6 +7,9 @@
       <ul class="circle--pill--list">
         <li><a class="selected" href="{% url 'projects:applications' %}">Applications</a></li>
         <li><a href="{% url 'profiles:view-profile' pk=user.profile.pk %}">Profile</a></li>
+        {% if user.is_authenticated and user == user.profile.user %}
+            <li><a href="{% url 'profiles:notifications' %}">Notifications</a></li>
+        {% endif %}
       </ul>
     </nav>
   </div>
@@ -50,6 +53,9 @@
     </div>
 
     <div class="grid-70 grid-push-5">
+      {% if not applications %}
+        <p>There are no applications to show</p>
+      {% else %}
       <table class="u-full-width circle--table">
         <thead>
           <tr>
@@ -88,7 +94,7 @@
           {% endfor %}
         </tbody>
       </table>
-
+    {% endif %}
     </div>
 
   </div>
