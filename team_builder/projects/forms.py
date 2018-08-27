@@ -88,7 +88,6 @@ class PositionForm(forms.ModelForm):
         skill, _ = Skill.objects.get_or_create(skill=related_skill)
         return skill
 
-
     class Meta:
         fields = ("title", "description", "related_skill")
         model = models.Position

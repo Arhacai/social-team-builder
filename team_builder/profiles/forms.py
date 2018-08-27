@@ -12,7 +12,7 @@ class ProfileUpdateForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={'placeholder': 'Enter your desired display name...'}),
-    validators = [MaxLengthValidator]
+        validators=[MaxLengthValidator]
     )
     bio = forms.CharField(
         label='About You',

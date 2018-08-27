@@ -8,7 +8,7 @@ from django.views import generic
 
 from . import models
 from . import forms
-from profiles.models import Notification, Skill
+from profiles.models import Notification
 
 
 class ProjectView(generic.TemplateView):
@@ -48,10 +48,25 @@ class ProjectCreateView(LoginRequiredMixin, generic.CreateView):
                 position.related_project = project
                 position.save()
                 project.positions.add(position)
-            messages.add_message(self.request, messages.SUCCESS, "Project created successfully!")
-            return HttpResponseRedirect(reverse('projects:view-project', kwargs={'pk': project.pk}))
-        messages.add_message(self.request, messages.ERROR, "Something went wrong! Please check fields with errors...")
-        return render(self.request, self.template_name, {'project_form': project_form, 'position_formset': position_formset})
+            messages.add_message(
+                self.request, messages.SUCCESS, "Project created successfully!"
+            )
+            return HttpResponseRedirect(
+                reverse('projects:view-project', kwargs={'pk': project.pk})
+            )
+        messages.add_message(
+            self.request,
+            messages.ERROR,
+            "Something went wrong! Please check fields with errors..."
+        )
+        return render(
+            self.request,
+            self.template_name,
+            {
+                'project_form': project_form,
+                'position_formset': position_formset
+            }
+        )
 
 
 class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
@@ -83,21 +98,43 @@ class ProjectEditView(LoginRequiredMixin, generic.UpdateView):
                     position.related_project = project
                     position.save()
                     project.positions.add(position)
-            messages.add_message(self.request, messages.SUCCESS, "Project updated successfully!")
+            messages.add_message(
+                self.request, messages.SUCCESS, "Project updated successfully!"
+            )
             return self.get_success_url()
-        messages.add_message(self.request, messages.ERROR, "Something went wrong! Please check fields with errors...")
-        return self.render_to_response(self.get_context_data(object=self.object, project_form=project_form, position_formset=position_formset))
+        messages.add_message(
+            self.request,
+            messages.ERROR,
+            "Something went wrong! Please check fields with errors..."
+        )
+        return self.render_to_response(
+            self.get_context_data(
+                object=self.object,
+                project_form=project_form,
+                position_formset=position_formset)
+        )
 
     def get(self, request, *args, **kwargs):
         super(ProjectEditView, self).get(request, *args, **kwargs)
         project_form = self.form_class(instance=self.object)
         positions = self.object.positions.all()
-        data = [{'title': position.title, 'description': position.description, 'related_skill': position.related_skill} for position in positions]
+        data = [{
+            'title': position.title,
+            'description': position.description,
+            'related_skill': position.related_skill
+        } for position in positions]
         if not data:
-            position_formset = forms.PositionFormSet(initial=[{'title': '', 'description': ''}])
+            position_formset = forms.PositionFormSet(
+                initial=[{'title': '', 'description': ''}]
+            )
         else:
             position_formset = forms.PositionFormSet(initial=data)
-        return self.render_to_response(self.get_context_data(project_form=project_form, position_formset=position_formset))
+        return self.render_to_response(
+            self.get_context_data(
+                project_form=project_form,
+                position_formset=position_formset
+            )
+        )
 
 
 class ProjectDeleteView(LoginRequiredMixin, generic.DeleteView):
@@ -118,11 +155,18 @@ class ProjectSearchView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProjectSearchView, self).get_context_data(**kwargs)
-        context['active_projects'] = self.get_queryset().filter(completed=False)
+        context['active_projects'] = self.get_queryset().filter(
+            completed=False
+        )
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
-        context['skills'] = [position.related_skill for position in models.Position.objects.filter(
-            id__in=models.Position.objects.all().values_list('related_skill', flat=True).distinct())]
+        context['skills'] = [
+            position.related_skill
+            for position in models.Position.objects.filter(
+                id__in=models.Position.objects.all().values_list(
+                    'related_skill', flat=True).distinct()
+            )
+        ]
         return context
 
 
@@ -132,16 +176,25 @@ class ProjectFilterView(generic.ListView):
 
     def get_queryset(self):
         slug = self.kwargs.get('slug')
-        query_set = models.Project.objects.filter(Q(positions__title=slug) | Q(positions__related_skill__skill=slug))
+        query_set = models.Project.objects.filter(
+            Q(positions__title=slug) | Q(positions__related_skill__skill=slug)
+        )
         return query_set
 
     def get_context_data(self, **kwargs):
         context = super(ProjectFilterView, self).get_context_data(**kwargs)
-        context['active_projects'] = self.get_queryset().filter(completed=False)
+        context['active_projects'] = self.get_queryset().filter(
+            completed=False
+        )
         context['past_projects'] = self.get_queryset().filter(completed=True)
         context['positions'] = models.Position.objects.all()
-        context['skills'] = [position.related_skill for position in models.Position.objects.filter(
-            id__in=models.Position.objects.all().values_list('related_skill', flat=True).distinct())]
+        context['skills'] = [
+            position.related_skill
+            for position in models.Position.objects.filter(
+                id__in=models.Position.objects.all().values_list(
+                    'related_skill', flat=True).distinct()
+            )
+        ]
         context['selected'] = self.kwargs.get('slug')
         return context
 
@@ -157,30 +210,40 @@ class ProjectChangeStatusView(generic.RedirectView):
             project.completed = False
             for position in project.positions.all():
                 if position.filled_by:
-                    Notification.objects.get_or_create(user=position.filled_by,
-                                                       message="The project {} is now open.".format(project))
+                    Notification.objects.get_or_create(
+                        user=position.filled_by,
+                        message="The project {} is now open.".format(project))
         else:
             project.completed = True
             for position in project.positions.all():
                 if position.filled_by:
-                    Notification.objects.get_or_create(user=position.filled_by,
-                                                       message="The project {} is now closed.".format(project))
+                    Notification.objects.get_or_create(
+                        user=position.filled_by,
+                        message="The project {} is now closed.".format(project)
+                    )
         project.save()
-        return super(ProjectChangeStatusView, self).get_redirect_url(*args, **kwargs)
+        return super(
+            ProjectChangeStatusView, self).get_redirect_url(*args, **kwargs)
 
 
 class ApplicationView(generic.RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        project = get_object_or_404(models.Project, pk=kwargs.get('project_pk'))
+        project = get_object_or_404(
+            models.Project,
+            pk=kwargs.get('project_pk')
+        )
         position = get_object_or_404(models.Position, pk=kwargs.get('pk'))
         application, _ = models.Application.objects.get_or_create(
             applicant=self.request.user,
             position=position
         )
-        Notification.objects.get_or_create(user=self.request.user,
-                                           message="You've applied to {} position for {} project.".format(
-                                               position, project))
+        Notification.objects.get_or_create(
+            user=self.request.user,
+            message="You've applied to {} position for {} project.".format(
+                position, project
+            )
+        )
         position.applications.add(application)
         return reverse_lazy('projects:view-project', kwargs={'pk': project.pk})
 
@@ -189,7 +252,9 @@ class ApplicationListView(generic.ListView):
     template_name = 'projects/applications.html'
 
     def get_queryset(self):
-        return models.Application.objects.filter(position__project__owner=self.request.user)
+        return models.Application.objects.filter(
+            position__project__owner=self.request.user
+        )
 
     def get_context_data(self, **kwargs):
         context = super(ApplicationListView, self).get_context_data(**kwargs)
@@ -233,8 +298,12 @@ class ApplicationFilterView(generic.ListView):
         return query_set
 
     def get_queryset(self):
-        query_set = models.Application.objects.filter(position__project__owner=self.request.user)
-        return self.filter_positions(self.filter_projects(self.filter_status(query_set)))
+        query_set = models.Application.objects.filter(
+            position__project__owner=self.request.user
+        )
+        return self.filter_positions(
+            self.filter_projects(self.filter_status(query_set))
+        )
 
     def get_context_data(self, **kwargs):
         context = super(ApplicationFilterView, self).get_context_data(**kwargs)
@@ -255,27 +324,36 @@ class ApplicationFilterView(generic.ListView):
 class ApplicationStatusView(generic.RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        application = get_object_or_404(models.Application, pk=kwargs.get('pk'))
+        application = get_object_or_404(
+            models.Application,
+            pk=kwargs.get('pk')
+        )
         position = application.position
         if kwargs.get('status') == 'accept':
             application.accepted = True
             application.save()
-            Notification.objects.get_or_create(user=application.applicant,
-                                              message="Your application on {} has been accepted.".format(
-                                                  application.position))
+            Notification.objects.get_or_create(
+                user=application.applicant,
+                message="Your application on {} has been accepted.".format(
+                    application.position)
+            )
             position.filled = True
             position.filled_by = application.applicant
             position.save()
             for app in position.applications.all():
                 if not app.accepted:
                     app.rejected = True
-                    Notification.objects.get_or_create(user=app.applicant,
-                                                      message="Your application on {} has been rejected.".format(
-                                                          app.position))
+                    Notification.objects.get_or_create(
+                        user=app.applicant,
+                        message="Your application on "
+                                "{} has been rejected.".format(app.position)
+                    )
                     app.save()
         else:
             application.rejected = True
             application.save()
-            Notification.objects.get_or_create(user=application.applicant, message="Your application on {} has been rejected.".format(application.position))
+            Notification.objects.get_or_create(
+                user=application.applicant,
+                message="Your application on "
+                        "{} has been rejected.".format(application.position))
         return self.request.META['HTTP_REFERER']
-

@@ -12,7 +12,11 @@ class Skill(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="profile"
+    )
     display_name = models.CharField(max_length=50, null=True, blank=True)
     bio = models.CharField(max_length=500, blank=True, default="")
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
@@ -35,7 +39,11 @@ class Profile(models.Model):
 
 
 class Notification(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="notifications"
+    )
     message = models.CharField(max_length=150)
     created_at = models.DateTimeField(auto_now=datetime.datetime.now)
     read = models.BooleanField(default=False)
